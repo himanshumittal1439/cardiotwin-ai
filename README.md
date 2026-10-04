@@ -42,9 +42,9 @@ All mandatory requirements specified in the technical and expert evaluation guid
 
 ## 2. College / Incubator Information
 
-- **Institution:** Department of Computer Science & Biomedical Engineering
-- **Incubator / Innovation Hub:** Healthcare AI & Deep-Tech Incubation Center
-- **Affiliated Hospital / Clinical Partner:** Academic Health Science Network & Critical Care Simulation Lab
+- **Institution:** Apex Institute of Technology (AIT), Chandigarh University, Mohali
+- **Department:** Department of Computer Science & Engineering / AI & Biomedical Computing
+- **Incubator / Innovation Hub:** Chandigarh University Technology Business Incubator (CU-TBI) & Healthcare AI Lab
 - **Competition Track:** Digital Twin Proof-of-Concept — Healthcare & Precision Medicine Track
 
 ---

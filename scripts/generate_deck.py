@@ -101,13 +101,13 @@ def generate_deck(output_path: str):
 
     # Details card on title slide
     p_team = tf1.add_paragraph()
-    p_team.text = "\nTeam: Team Obsidian | Lead: Himanshu | Track: Healthcare & Precision Medicine"
+    p_team.text = "\nTeam: Team Obsidian | Lead: Himanshu | Apex Institute of Technology (AIT), Chandigarh University"
     p_team.font.size = Pt(12)
     p_team.font.bold = True
     p_team.font.color.rgb = WHITE
 
     p_links = tf1.add_paragraph()
-    p_links.text = "Repository: Public GitHub Repository | Evaluation Track: Healthcare & Precision Medicine"
+    p_links.text = "Incubator: CU-TBI Innovation Hub | Repository: Public GitHub | Track: Healthcare & Precision Medicine"
     p_links.font.size = Pt(11)
     p_links.font.color.rgb = RGBColor(148, 163, 184)
 
@@ -579,7 +579,8 @@ Submission Deliverables & Evaluation Verification:
 ✔ Unlisted YouTube Video Walkthrough Guide (README Timestamped Script)
 ✔ MIT Open-Source License & Full Public Repository Accessibility
 
-Team: Team Obsidian | Lead: Himanshu | Track: Healthcare & Precision Medicine
+Team: Team Obsidian | Lead: Himanshu | Apex Institute of Technology (AIT), Chandigarh University
+Incubator: Chandigarh University Technology Business Incubator (CU-TBI)
 Repository: Public GitHub Repository | Ready for Panel Review & Live Demonstration.
 """
     p2.font.size = Pt(12.5)
