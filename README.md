@@ -33,7 +33,7 @@ All mandatory requirements specified in the technical and expert evaluation guid
 
 | Name | Role | Responsibilities | Contact / GitHub |
 | :--- | :--- | :--- | :--- |
-| **Himanshu** | Team Lead & AI Systems Architect | Project Lead, Biophysical ODE modeling, ML surrogate neural network architecture | `himanshu@team-obsidian.org` / [@himanshu](https://github.com/) |
+| **Himanshu** | Team Lead & AI Systems Architect | Project Lead, Biophysical ODE modeling, ML surrogate neural network architecture | `himanshu@team-obsidian.org` / [@himanshumittal1439](https://github.com/himanshumittal1439) |
 | **Team Member** | Clinical Informatics & Validation | Hemodynamic parameter calibration, NYHA cohorts, pharmacodynamics mapping | `clinical@team-obsidian.org` |
 | **Team Member** | Visualization & Full-Stack UI | Streamlit interactive UI, Plotly 3D mesh rendering, Wiggers diagram integration | `ui@team-obsidian.org` |
 
@@ -320,7 +320,7 @@ A comprehensive **14-slide executive and technical presentation deck** has been 
 
 ### 2. Clone Repository & Install Dependencies
 ```bash
-git clone https://github.com/YOUR_USERNAME/cardiotwin-ai.git
+git clone https://github.com/himanshumittal1439/cardiotwin-ai.git
 cd cardiotwin-ai
 pip install -r requirements.txt
 ```
