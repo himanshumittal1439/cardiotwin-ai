@@ -101,7 +101,7 @@ def generate_deck(output_path: str):
 
     # Details card on title slide
     p_team = tf1.add_paragraph()
-    p_team.text = "\nTeam: Team CardioTwin | Institution / Incubator: Healthcare AI Innovation Lab"
+    p_team.text = "\nTeam: Team Obsidian | Lead: Himanshu | Track: Healthcare & Precision Medicine"
     p_team.font.size = Pt(12)
     p_team.font.bold = True
     p_team.font.color.rgb = WHITE
@@ -579,7 +579,7 @@ Submission Deliverables & Evaluation Verification:
 ✔ Unlisted YouTube Video Walkthrough Guide (README Timestamped Script)
 ✔ MIT Open-Source License & Full Public Repository Accessibility
 
-Team: Team CardioTwin | Institution / Incubator: Healthcare AI Innovation Lab
+Team: Team Obsidian | Lead: Himanshu | Track: Healthcare & Precision Medicine
 Repository: Public GitHub Repository | Ready for Panel Review & Live Demonstration.
 """
     p2.font.size = Pt(12.5)

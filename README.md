@@ -29,13 +29,14 @@ All mandatory requirements specified in the technical and expert evaluation guid
 
 ## 1. Team Details
 
+**Team Name:** **Obsidian**
+
 | Name | Role | Responsibilities | Contact / GitHub |
 | :--- | :--- | :--- | :--- |
-| **Lead Developer** | AI & Biophysical Systems Lead | Digital twin mathematical modeling, ODE solver, ML surrogate architecture | `lead@cardiotwin.org` / [@LeadDev](https://github.com/) |
-| **Clinical Informatics Lead** | Medical Domain & Evaluation | Clinical parameters calibration, NYHA cohorts, pharmacodynamics mapping | `clinical@cardiotwin.org` / [@ClinicalLead](https://github.com/) |
-| **Full-Stack / UI Engineer** | Visualization & Dashboard Lead | Streamlit interactive UI, Plotly 3D mesh rendering, Wiggers diagram integration | `ui@cardiotwin.org` / [@UILead](https://github.com/) |
+| **Himanshu** | Team Lead & AI Systems Architect | Project Lead, Biophysical ODE modeling, ML surrogate neural network architecture | `himanshu@team-obsidian.org` / [@himanshu](https://github.com/) |
+| **Team Member** | Clinical Informatics & Validation | Hemodynamic parameter calibration, NYHA cohorts, pharmacodynamics mapping | `clinical@team-obsidian.org` |
+| **Team Member** | Visualization & Full-Stack UI | Streamlit interactive UI, Plotly 3D mesh rendering, Wiggers diagram integration | `ui@team-obsidian.org` |
 
-> *Note: Please update the team names, email addresses, and GitHub handles to match your official competition team roster.*
 
 ---
 
