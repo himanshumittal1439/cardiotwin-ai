@@ -19,6 +19,7 @@ from models.hemodynamics import (
 )
 from models.ml_surrogate import BiophysicalSurrogateModel
 from models.arrhythmia_classifier import ArrhythmiaClassifier
+from models.threejs_viewer import render_photorealistic_heart_html
 from data.patient_profiles import PATIENT_COHORTS, PatientProfile
 
 # Page Configuration
@@ -223,141 +224,150 @@ with tab_twin:
     col_3d, col_wiggers = st.columns([1, 1.4])
 
     with col_3d:
-        st.subheader("Anatomical Cardiac Mesh Twin")
-        st.caption("Morphological 3D chamber geometry dynamically coupled with left-ventricular pressure.")
+        st.subheader("Anatomical 3D Cardiac Twin")
+        st.caption("Coupled Left-Ventricular chamber geometry with live pulsatile kinematics.")
 
-        # Anatomical 3D Multi-Chamber Cardiac Geometry
-        scale = (base_metrics["EDV"] / 130.0) ** (1/3)
-
-        # 1. Ventricular Body (Tapered prolate ellipsoid with apex tilt)
-        u_v = np.linspace(0, np.pi, 36)
-        v_v = np.linspace(0, 2 * np.pi, 36)
-        UV, VV = np.meshgrid(u_v, v_v)
-        r_base = 2.8 * scale
-        h_vent = 4.3 * scale
-
-        taper = np.sin(UV * 0.95)
-        x_vent = r_base * taper * np.cos(VV) + 0.35 * np.cos(UV)**2
-        y_vent = r_base * 0.88 * taper * np.sin(VV) + 0.25 * np.sin(UV)
-        z_vent = h_vent * (np.cos(UV) - 0.25)
-        # Flatten posterior wall for anatomical septum/base
-        y_vent = np.where(y_vent < -0.8 * r_base, -0.8 * r_base + 0.3 * (y_vent + 0.8 * r_base), y_vent)
-
-        # 2. Aortic Arch (Ascending & arching arterial great vessel)
-        t_ao = np.linspace(0, np.pi * 0.85, 26)
-        th_tube = np.linspace(0, 2 * np.pi, 18)
-        T_ao, TH_ao = np.meshgrid(t_ao, th_tube)
-        r_ao = 0.68 * scale
-        cx_ao = 0.4 + 1.7 * np.cos(T_ao - 0.2)
-        cy_ao = -0.2 - 0.4 * np.sin(T_ao)
-        cz_ao = 2.2 * scale + 2.1 * np.sin(T_ao)
-        x_ao = cx_ao + r_ao * np.cos(TH_ao)
-        y_ao = cy_ao + r_ao * np.sin(TH_ao) * 0.8
-        z_ao = cz_ao + r_ao * np.sin(TH_ao) * 0.5
-
-        # 3. Pulmonary Trunk (Crossing anteriorly, deoxygenated blue vessel)
-        t_pa = np.linspace(0, 1.25, 22)
-        T_pa, TH_pa = np.meshgrid(t_pa, th_tube)
-        r_pa = 0.62 * scale
-        cx_pa = -0.6 + 1.25 * T_pa
-        cy_pa = 0.85 - 0.5 * T_pa
-        cz_pa = 2.0 * scale + 1.65 * T_pa
-        x_pa = cx_pa + r_pa * np.cos(TH_pa)
-        y_pa = cy_pa + r_pa * np.sin(TH_pa)
-        z_pa = cz_pa + r_pa * np.cos(TH_pa) * 0.35
-
-        # 4. Left & Right Atria (Superior posterior rounded reservoirs)
-        u_at = np.linspace(0, np.pi, 20)
-        v_at = np.linspace(0, 2 * np.pi, 20)
-        UA, VA = np.meshgrid(u_at, v_at)
-        x_la = 1.15 * scale + 1.05 * np.sin(UA) * np.cos(VA)
-        y_la = -1.25 * scale + 0.95 * np.sin(UA) * np.sin(VA)
-        z_la = 2.2 * scale + 1.05 * np.cos(UA)
-
-        x_ra = -1.35 * scale + 1.15 * np.sin(UA) * np.cos(VA)
-        y_ra = -0.85 * scale + 1.05 * np.sin(UA) * np.sin(VA)
-        z_ra = 1.95 * scale + 1.05 * np.cos(UA)
-
-        # 5. LAD Coronary Artery (Branching along anterior interventricular sulcus)
-        t_lad = np.linspace(0, np.pi * 0.78, 45)
-        lad_x = r_base * np.sin(t_lad * 0.95) * np.cos(0.28) + 0.35 * np.cos(t_lad)**2
-        lad_y = r_base * 0.88 * np.sin(t_lad * 0.95) * np.sin(0.28) + 0.25 * np.sin(t_lad) + 0.12
-        lad_z = h_vent * (np.cos(t_lad) - 0.25)
-
-        fig_3d = go.Figure()
-
-        # Ventricles (Muscular Myocardium)
-        fig_3d.add_trace(go.Surface(
-            x=x_vent, y=y_vent, z=z_vent,
-            colorscale=[[0, "#800000"], [0.5, "#B22222"], [1.0, "#E63946"]],
-            showscale=False,
-            name="Ventricles (LV & RV)",
-            lighting=dict(ambient=0.55, diffuse=0.85, roughness=0.3, specular=0.45)
-        ))
-
-        # Aorta & Aortic Arch (Bright Arterial Vessel)
-        fig_3d.add_trace(go.Surface(
-            x=x_ao, y=y_ao, z=z_ao,
-            colorscale=[[0, "#DC2626"], [1.0, "#F87171"]],
-            showscale=False,
-            name="Aortic Arch",
-            lighting=dict(ambient=0.6, diffuse=0.85, roughness=0.25, specular=0.6)
-        ))
-
-        # Pulmonary Trunk (Cyan / Deoxygenated Vessel)
-        fig_3d.add_trace(go.Surface(
-            x=x_pa, y=y_pa, z=z_pa,
-            colorscale=[[0, "#1E3A8A"], [0.5, "#2563EB"], [1.0, "#60A5FA"]],
-            showscale=False,
-            name="Pulmonary Trunk",
-            lighting=dict(ambient=0.6, diffuse=0.85, roughness=0.25, specular=0.5)
-        ))
-
-        # Left & Right Atria
-        fig_3d.add_trace(go.Surface(
-            x=x_la, y=y_la, z=z_la,
-            colorscale=[[0, "#831843"], [1.0, "#BE185D"]],
-            showscale=False,
-            name="Left Atrium",
-            opacity=0.92
-        ))
-        fig_3d.add_trace(go.Surface(
-            x=x_ra, y=y_ra, z=z_ra,
-            colorscale=[[0, "#312E81"], [1.0, "#4338CA"]],
-            showscale=False,
-            name="Right Atrium",
-            opacity=0.92
-        ))
-
-        # Coronary Artery (LAD Sulcus Branch)
-        fig_3d.add_trace(go.Scatter3d(
-            x=lad_x, y=lad_y, z=lad_z,
-            mode="lines",
-            line=dict(color="#FACC15", width=4.5),
-            name="LAD Coronary Artery"
-        ))
-
-        fig_3d.update_layout(
-            scene=dict(
-                xaxis=dict(showticklabels=False, showgrid=False, zeroline=False, title=""),
-                yaxis=dict(showticklabels=False, showgrid=False, zeroline=False, title=""),
-                zaxis=dict(showticklabels=False, showgrid=False, zeroline=False, title=""),
-                bgcolor="rgba(240, 244, 248, 0.4)",
-                camera=dict(eye=dict(x=1.75, y=1.65, z=1.15))
-            ),
-            margin=dict(l=0, r=0, t=10, b=10),
-            height=370,
-            showlegend=True,
-            legend=dict(
-                orientation="h",
-                yanchor="bottom",
-                y=0.01,
-                xanchor="center",
-                x=0.5,
-                font=dict(size=10)
-            )
+        view_3d_mode = st.radio(
+            "Select 3D Render Mode:",
+            options=["🌟 Photorealistic 3D Heart (WebGL)", "📊 Multi-Chamber Hemodynamic Mesh (Plotly)"],
+            horizontal=True,
+            label_visibility="collapsed"
         )
-        st.plotly_chart(fig_3d, use_container_width=True)
+
+        if "Photorealistic" in view_3d_mode:
+            html_3d = render_photorealistic_heart_html(
+                hr=active_baseline.hr,
+                ef=base_metrics["LVEF"],
+                height=380
+            )
+            st.components.v1.html(html_3d, height=395)
+        else:
+            # Anatomical 3D Multi-Chamber Cardiac Geometry (Plotly 3D)
+            scale = (base_metrics["EDV"] / 130.0) ** (1/3)
+
+            # 1. Ventricular Body (Tapered prolate ellipsoid with apex tilt)
+            u_v = np.linspace(0, np.pi, 36)
+            v_v = np.linspace(0, 2 * np.pi, 36)
+            UV, VV = np.meshgrid(u_v, v_v)
+            r_base = 2.8 * scale
+            h_vent = 4.3 * scale
+
+            taper = np.sin(UV * 0.95)
+            x_vent = r_base * taper * np.cos(VV) + 0.35 * np.cos(UV)**2
+            y_vent = r_base * 0.88 * taper * np.sin(VV) + 0.25 * np.sin(UV)
+            z_vent = h_vent * (np.cos(UV) - 0.25)
+            y_vent = np.where(y_vent < -0.8 * r_base, -0.8 * r_base + 0.3 * (y_vent + 0.8 * r_base), y_vent)
+
+            # 2. Aortic Arch (Ascending & arching arterial great vessel)
+            t_ao = np.linspace(0, np.pi * 0.85, 26)
+            th_tube = np.linspace(0, 2 * np.pi, 18)
+            T_ao, TH_ao = np.meshgrid(t_ao, th_tube)
+            r_ao = 0.68 * scale
+            cx_ao = 0.4 + 1.7 * np.cos(T_ao - 0.2)
+            cy_ao = -0.2 - 0.4 * np.sin(T_ao)
+            cz_ao = 2.2 * scale + 2.1 * np.sin(T_ao)
+            x_ao = cx_ao + r_ao * np.cos(TH_ao)
+            y_ao = cy_ao + r_ao * np.sin(TH_ao) * 0.8
+            z_ao = cz_ao + r_ao * np.sin(TH_ao) * 0.5
+
+            # 3. Pulmonary Trunk (Crossing anteriorly, deoxygenated blue vessel)
+            t_pa = np.linspace(0, 1.25, 22)
+            T_pa, TH_pa = np.meshgrid(t_pa, th_tube)
+            r_pa = 0.62 * scale
+            cx_pa = -0.6 + 1.25 * T_pa
+            cy_pa = 0.85 - 0.5 * T_pa
+            cz_pa = 2.0 * scale + 1.65 * T_pa
+            x_pa = cx_pa + r_pa * np.cos(TH_pa)
+            y_pa = cy_pa + r_pa * np.sin(TH_pa)
+            z_pa = cz_pa + r_pa * np.cos(TH_pa) * 0.35
+
+            # 4. Left & Right Atria
+            u_at = np.linspace(0, np.pi, 20)
+            v_at = np.linspace(0, 2 * np.pi, 20)
+            UA, VA = np.meshgrid(u_at, v_at)
+            x_la = 1.15 * scale + 1.05 * np.sin(UA) * np.cos(VA)
+            y_la = -1.25 * scale + 0.95 * np.sin(UA) * np.sin(VA)
+            z_la = 2.2 * scale + 1.05 * np.cos(UA)
+            x_ra = -1.35 * scale + 1.15 * np.sin(UA) * np.cos(VA)
+            y_ra = -0.85 * scale + 1.05 * np.sin(UA) * np.sin(VA)
+            z_ra = 1.95 * scale + 1.05 * np.cos(UA)
+
+            # 5. LAD Coronary Artery
+            t_lad = np.linspace(0, np.pi * 0.78, 45)
+            lad_x = r_base * np.sin(t_lad * 0.95) * np.cos(0.28) + 0.35 * np.cos(t_lad)**2
+            lad_y = r_base * 0.88 * np.sin(t_lad * 0.95) * np.sin(0.28) + 0.25 * np.sin(t_lad) + 0.12
+            lad_z = h_vent * (np.cos(t_lad) - 0.25)
+
+            fig_3d = go.Figure()
+
+            # Ventricles
+            fig_3d.add_trace(go.Surface(
+                x=x_vent, y=y_vent, z=z_vent,
+                colorscale=[[0, "#800000"], [0.5, "#B22222"], [1.0, "#E63946"]],
+                showscale=False,
+                name="Ventricles (LV & RV)",
+                lighting=dict(ambient=0.55, diffuse=0.85, roughness=0.3, specular=0.45)
+            ))
+            # Aorta & Arch
+            fig_3d.add_trace(go.Surface(
+                x=x_ao, y=y_ao, z=z_ao,
+                colorscale=[[0, "#DC2626"], [1.0, "#F87171"]],
+                showscale=False,
+                name="Aortic Arch",
+                lighting=dict(ambient=0.6, diffuse=0.85, roughness=0.25, specular=0.6)
+            ))
+            # Pulmonary Trunk
+            fig_3d.add_trace(go.Surface(
+                x=x_pa, y=y_pa, z=z_pa,
+                colorscale=[[0, "#1E3A8A"], [0.5, "#2563EB"], [1.0, "#60A5FA"]],
+                showscale=False,
+                name="Pulmonary Trunk",
+                lighting=dict(ambient=0.6, diffuse=0.85, roughness=0.25, specular=0.5)
+            ))
+            # Atria
+            fig_3d.add_trace(go.Surface(
+                x=x_la, y=y_la, z=z_la,
+                colorscale=[[0, "#831843"], [1.0, "#BE185D"]],
+                showscale=False,
+                name="Left Atrium",
+                opacity=0.92
+            ))
+            fig_3d.add_trace(go.Surface(
+                x=x_ra, y=y_ra, z=z_ra,
+                colorscale=[[0, "#312E81"], [1.0, "#4338CA"]],
+                showscale=False,
+                name="Right Atrium",
+                opacity=0.92
+            ))
+            # LAD Coronary Artery
+            fig_3d.add_trace(go.Scatter3d(
+                x=lad_x, y=lad_y, z=lad_z,
+                mode="lines",
+                line=dict(color="#FACC15", width=4.5),
+                name="LAD Coronary Artery"
+            ))
+
+            fig_3d.update_layout(
+                scene=dict(
+                    xaxis=dict(showticklabels=False, showgrid=False, zeroline=False, title=""),
+                    yaxis=dict(showticklabels=False, showgrid=False, zeroline=False, title=""),
+                    zaxis=dict(showticklabels=False, showgrid=False, zeroline=False, title=""),
+                    bgcolor="rgba(240, 244, 248, 0.4)",
+                    camera=dict(eye=dict(x=1.75, y=1.65, z=1.15))
+                ),
+                margin=dict(l=0, r=0, t=10, b=10),
+                height=370,
+                showlegend=True,
+                legend=dict(
+                    orientation="h",
+                    yanchor="bottom",
+                    y=0.01,
+                    xanchor="center",
+                    x=0.5,
+                    font=dict(size=10)
+                )
+            )
+            st.plotly_chart(fig_3d, use_container_width=True)
 
         # Biomechanical Parameters
         p_c1, p_c2 = st.columns(2)

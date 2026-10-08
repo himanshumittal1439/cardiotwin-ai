@@ -247,6 +247,7 @@ Copyright (c) 2026 CardioTwin Contributors
 - **Permissibility:** Grants free commercial, educational, and research reuse, modification, and distribution.
 - **Clinical SaMD Compliance:** Allows academic health systems and research hospitals to freely audit, validate, and extend the computational models.
 - **License File:** See the full [LICENSE](LICENSE) file in the root directory.
+- **3D Asset Attribution:** The photorealistic 3D cardiac anatomical model is based on *"Realistic Human Heart"* by [neshallads](https://sketchfab.com/neshallads), licensed under [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/).
 
 ---
 
