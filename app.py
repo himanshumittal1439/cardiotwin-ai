@@ -404,9 +404,16 @@ with tab_twin:
         )
 
         fig_wiggers.update_layout(
-            height=380,
-            margin=dict(l=40, r=20, t=30, b=30),
-            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+            height=400,
+            margin=dict(l=40, r=20, t=65, b=35),
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.12,
+                xanchor="right",
+                x=1.0,
+                font=dict(size=11)
+            ),
             hovermode="x unified",
             template="plotly_white"
         )
